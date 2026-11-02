@@ -7,11 +7,13 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 import json
+# import 用于导入模块；sqlite3 是 Python 自带的轻量数据库工具。
 import sqlite3
 
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
+# DB_FILE 是变量名；= 将右边的数据库路径保存给它；__file__ 代表当前文件路径。
 DB_FILE = Path(__file__).with_name("stellula_mini.db")
 
 # 演示数据是虚构的，仅用于课堂，不代表真实竞赛通知。
@@ -26,8 +28,11 @@ DEMO = [
 # def 是 Python 定义函数的关键字；括号中是参数列表。注意：def 本身不是构造函数，__init__ 是类中常见的初始化方法。
 def connect_db():
     """每次数据库操作新建连接；row_factory 让查询结果按列名访问。"""
+# sqlite3.connect 打开数据库文件，文件不存在时会自动创建。
     connection = sqlite3.connect(DB_FILE)
+# 让查询结果支持按字段名字读取，如 row["name"]。
     connection.row_factory = sqlite3.Row
+# return 把连接对象返回给调用它的代码。
     return connection
 
 
@@ -45,7 +50,9 @@ def init_db():
                 summary TEXT NOT NULL
             )
         """)
+# SELECT COUNT(*) 统计行数；fetchone() 取一行；[0] 取第一列。
         number = db.execute("SELECT COUNT(*) FROM competitions").fetchone()[0]
+# if 表示条件判断；== 判断两边是否相等，空表时才插入演示数据。
         if number == 0:
             db.executemany(
                 "INSERT INTO competitions (name, majors, interests, years, summary) VALUES (?, ?, ?, ?, ?)",
@@ -77,18 +84,23 @@ class CompetitionInput(BaseModel):
 
 def parse_row(row):
     """数据库把列表保存成 JSON 字符串；返回接口前再还原成列表。"""
+# dict() 把一条数据库记录转换成字典，字典通过“键”查找对应“值”。
     data = dict(row)
+# for 循环依次访问三个字段；key 是当前字段名称。
     for key in ("majors", "interests", "years"):
+# json.loads 把 JSON 文本重新转换成 Python 列表。
         data[key] = json.loads(data[key])
     return data
 
 
 def all_competitions():
     with connect_db() as db:
+# SELECT * 查所有字段；ORDER BY id 排序；fetchall() 获取全部查询结果。
         rows = db.execute("SELECT * FROM competitions ORDER BY id").fetchall()
     return [parse_row(row) for row in rows]
 
 
+# @app.get 是路由装饰器：访问这个 URL 时，框架会调用下面的函数。
 @app.get("/")
 def home():
     return {"message": "欢迎使用 Stellula Mini", "docs": "/docs"}
@@ -98,7 +110,9 @@ def home():
 def list_competitions(q: str = ""):
     """查询：未输入关键字时返回全部，输入后按名称或简介筛选。"""
     result = all_competitions()
+# strip() 清除字符串首尾空格；只有关键词非空才执行筛选。
     if q.strip():
+# lower() 把英文字母转成小写，搜索时可以忽略英文大小写。
         keyword = q.strip().lower()
         result = [c for c in result if keyword in (c["name"] + c["summary"]).lower()]
     return result
@@ -122,7 +136,9 @@ def match_competitions(
     # for ... in ... 表示依次取出每一个元素，item 是当前竞赛。
     for item in all_competitions():
         # 指定年级时，不在可参赛年级里的赛事直接跳过。
+# and 表示条件同时满足；如果年级不在允许列表中，就不推荐。
         if year is not None and item["years"] and year not in item["years"]:
+# continue 跳过当前赛事，进入下一轮 for 循环。
             continue
         reasons = []
         major_score = 0
@@ -130,10 +146,12 @@ def match_competitions(
         if major:
             if major.strip() in item["majors"]:
                 major_score = 70
+# append() 的作用是向列表末尾添加一条推荐理由。
                 reasons.append("专业直接匹配")
             elif "不限专业" in item["majors"]:
                 major_score = 25
                 reasons.append("面向多个专业开放")
+# any() 只要发现至少一个兴趣标签符合条件就返回 True。
         if interest and any(interest.strip().lower() in x.lower() for x in item["interests"]):
             interest_score = 30
             reasons.append("兴趣方向相关")
@@ -142,6 +160,7 @@ def match_competitions(
         # 无筛选条件时显示全部；有专业/兴趣条件时只显示相关项。
         if (major or interest) and score == 0:
             continue
+# **item 展开原字典的键值，再附上评分与理由；append 将其放进列表。
         results.append({**item, "match_score": score, "match_reasons": reasons})
     # return 返回排序结果；sorted 负责排序；lambda 定义临时的排序规则。
     return sorted(results, key=lambda c: (-c["match_score"], c["id"]))
@@ -156,6 +175,7 @@ def get_competition(competition_id: int):
     return parse_row(row)
 
 
+# POST 表示新增数据；状态码 201 表示创建成功。
 @app.post("/competitions", status_code=201)
 def add_competition(item: CompetitionInput):
     """增加：使用 SQL 参数占位符，避免直接拼接输入内容。"""
@@ -169,6 +189,7 @@ def add_competition(item: CompetitionInput):
     return get_competition(new_id)
 
 
+# PUT 用于更新一条指定编号的竞赛；编号在 URL 路径里传入。
 @app.put("/competitions/{competition_id}")
 def update_competition(competition_id: int, item: CompetitionInput):
     """修改：先检查目标存在，再使用 UPDATE 更新其字段。"""
@@ -183,6 +204,7 @@ def update_competition(competition_id: int, item: CompetitionInput):
     return get_competition(competition_id)
 
 
+# DELETE 表示删除一条指定编号的竞赛。
 @app.delete("/competitions/{competition_id}")
 def delete_competition(competition_id: int):
     """删除：按主键删除，返回简单的提示信息。"""
