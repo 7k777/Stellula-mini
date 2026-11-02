@@ -289,3 +289,24 @@ python -m uvicorn app:app --reload
 - FastAPI 的 `@app.get` / `@app.post` 等装饰器负责对外提供 HTTP 接口。
 
 课程版没有登录验证和管理员权限控制，**仅用于本地学习与演示，不应直接部署为公开可写服务**。
+
+
+## iPhone PWA 课程演示界面
+
+新增 `docs/` 目录：`index.html`、`app.js`、`demo-data.json`、`manifest.webmanifest`、`sw.js` 和 `icon.svg`。这个界面是独立编写的轻量课程前端，**没有复制正式 Stellula 的前端**，也不会连接生产环境。
+
+- `docs/index.html`：iPhone 适配的页面和表单
+- `docs/app.js`：关键词与专业、兴趣、年级匹配（纯 JavaScript 课程演示）
+- `docs/demo-data.json`：4 条虚构的展示数据
+- `docs/manifest.webmanifest`：PWA 图标与独立窗口设置
+- `docs/sw.js`：静态文件缓存，成功访问后可尝试离线打开
+
+### 在 iPhone 上安装
+
+在 GitHub 仓库设置中，进入 **Settings → Pages**，选择 **Deploy from a branch → main → /docs → Save**，等 GitHub Pages 发布完成后，使用 Safari 打开 Pages 网站，再点 **分享 → 添加到主屏幕 → 打开为网页 App**。
+
+预计 Pages 地址：`https://7k777.github.io/Stellula-mini/`，**只有在 GitHub Pages 设置完成并发布后才有效**，不要把仓库文件地址直接当成 PWA 地址。
+
+本 PWA **当前使用与 Mini Python 后端相同的教学匹配思路，但在浏览器端独立计算演示结果**，所以无需连接 API 就能进行手机端展示。它不是生产站点、也不是已经接通后端的端到端示例。课堂上要展示真正的 Python 后端，可单独运行 `app.py` 并打开 `/docs`。
+
+注意：GitHub Pages 只托管静态页面，不运行 Python。若以后要通过 iPhone 直接调用 Mini 后端，还需有可访问的 HTTPS API 服务，并配置 CORS、安全权限和数据隔离。
