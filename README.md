@@ -239,3 +239,53 @@ This repository will stay intentionally small: only material suitable for public
   <strong>Stellula</strong><br>
   <sub>Small stars can still show you where to go next. ✦</sub>
 </p>
+
+
+---
+
+## ✅ 已加入：可运行的 Stellula Mini Python 后端（课程版）
+
+该仓库现在包含 `app.py` 和 `requirements.txt`。它是**独立的教学实现**，根据正式 Stellula 的业务思想简化制作，不是生产后端的原样复制。
+
+### 在电脑上运行
+
+安装 Python 3.10 或更新版本，下载仓库，在项目目录打开终端：
+
+```bash
+python -m pip install -r requirements.txt
+python -m uvicorn app:app --reload
+```
+
+启动后打开 http://127.0.0.1:8000/docs ，就能在交互式文档中依次测试接口。
+
+### 课堂可展示的功能
+
+| 方法 | 路径 | 功能 |
+| --- | --- | --- |
+| GET | /competitions | 查看及关键词搜索竞赛 |
+| GET | /competitions/match | 按专业、年级、兴趣推荐 |
+| GET | /competitions/{competition_id} | 查看单个竞赛 |
+| POST | /competitions | 新增竞赛 |
+| PUT | /competitions/{competition_id} | 修改竞赛 |
+| DELETE | /competitions/{competition_id} | 删除竞赛 |
+
+首次启动时会自动创建本地 `stellula_mini.db` 并添加 4 条**虚构演示数据**。数据只用于课堂讲解，请勿当作真实竞赛通知。数据可保存在本机，重启程序后不会丢失。
+
+### 推荐功能怎么讲？
+
+1. 接收专业、年级、兴趣条件。
+2. 先排除年级不符合的竞赛。
+3. 专业直接匹配加 70 分，兴趣相关加 30 分；不限专业给予 25 分作为拓展选择。
+4. 过滤零分结果，并按照总分从高到低排序。
+5. 返回匹配分数及原因。
+
+**说明：** 这属于基于规则的推荐算法，不是训练得到的机器学习模型。正式版还包含更详细的专业映射、相关度权重、身份认证和后台维护等能力，均未复制到本公开课程仓库。
+
+### 答辩时可讲的基础 Python 知识
+
+- `def` 定义函数；`if` 判断；`for` 循环；列表与字典保存数据；
+- `sqlite3` 连接本地数据库，执行带 `?` 参数的 SQL；
+- `json.dumps` 和 `json.loads` 在字符串与列表间转换；
+- FastAPI 的 `@app.get` / `@app.post` 等装饰器负责对外提供 HTTP 接口。
+
+课程版没有登录验证和管理员权限控制，**仅用于本地学习与演示，不应直接部署为公开可写服务**。
