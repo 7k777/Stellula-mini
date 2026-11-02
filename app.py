@@ -47,7 +47,10 @@ def init_db():
         if number == 0:
             db.executemany(
                 "INSERT INTO competitions (name, majors, interests, years, summary) VALUES (?, ?, ?, ?, ?)",
-                DEMO,
+                [(name, json.dumps(majors.split(","), ensure_ascii=False),
+                  json.dumps(interests.split(","), ensure_ascii=False),
+                  json.dumps([int(y) for y in years.split(",")]), summary)
+                 for name, majors, interests, years, summary in DEMO],
             )
 
 
