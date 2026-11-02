@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101e38"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Stellula Mini">
+<link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>Stellula Mini · 竞赛导航</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#193051;background:#f4f7fd}
+*{box-sizing:border-box}body{margin:0;min-height:100dvh}header{background:linear-gradient(135deg,#132344,#314f8e);color:white;padding:calc(28px + env(safe-area-inset-top)) 22px 39px;border-radius:0 0 28px 28px}
+main{max-width:740px;margin:-22px auto 70px;padding:0 16px}.brand{font-size:14px;letter-spacing:2px;opacity:.86}.hero{font-size:28px;font-weight:800;margin:18px 0 9px}.sub{font-size:13px;opacity:.83;line-height:1.7}
+.panel{background:#fff;border:1px solid #e4e9f3;border-radius:19px;padding:18px;margin-bottom:14px;box-shadow:0 8px 25px #142e5a0c}
+h2{margin:0 0 14px;font-size:17px}label{display:block;font-size:12px;color:#65758b;margin:12px 0 6px}
+input{width:100%;border:1px solid #dae3f1;background:#f8faff;border-radius:11px;padding:13px;font-size:16px;color:#193051}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;background:#355bb0;color:white;border-radius:12px;padding:13px 16px;font-size:15px;font-weight:650;cursor:pointer}
+.btn.secondary{background:#edf2fd;color:#3554a1}.actions{display:flex;gap:10px;margin-top:16px}
+small{color:#70819a}.result{padding:14px 0;border-bottom:1px solid #edf1f8}.result:last-child{border-bottom:0}
+.result-title{font-weight:750;font-size:15px;margin:0 0 6px}.pill{display:inline-block;background:#e7efff;color:#3158a5;font-size:12px;padding:4px 8px;border-radius:100px;margin:4px 6px 0 0}
+.score{float:right;color:#3158a5;font-weight:750}.muted{color:#6b7b92;font-size:13px;line-height:1.55}.footer{text-align:center;font-size:11px;color:#7f8da0;padding:12px}
+#empty{padding:22px 0;color:#7b8ba3;text-align:center}#status{font-size:12px;color:#667890;margin-bottom:10px}
+</style>
+</head>
+<body><header><div class="brand">✦ STELLULA MINI</div><div class="hero">发现适合你的竞赛</div><div class="sub">Python 课程展示版 · 专业匹配 · 可解释推荐<br>独立演示数据，不连接 Stellula 正式网站</div></header>
+<main>
+<section class="panel"><h2>寻找竞赛</h2>
+<label for="major">我的专业</label><input id="major" placeholder="例如：软件工程">
+<div class="grid"><div><label for="year">当前年级</label><input id="year" type="number" min="1" max="8" placeholder="例如：3"></div>
+<div><label for="interest">感兴趣的方向</label><input id="interest" placeholder="例如：算法"></div></div>
+<div class="actions"><button class="btn" id="search">查看推荐 ✦</button><button class="btn secondary" id="reset">查看全部</button></div>
+</section>
+<section class="panel"><h2>竞赛推荐 <small id="count"></small></h2><div id="status">加载演示数据中…</div><div id="results"></div></section>
+<div class="footer">Stellula Mini · 独立课程演示 · 虚构样例非正式赛事通知</div>
+</main>
+<script src="./app.js" defer></script></body></html>
