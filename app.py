@@ -23,6 +23,7 @@ DEMO = [
 ]
 
 
+# def 是 Python 定义函数的关键字；括号中是参数列表。注意：def 本身不是构造函数，__init__ 是类中常见的初始化方法。
 def connect_db():
     """每次数据库操作新建连接；row_factory 让查询结果按列名访问。"""
     connection = sqlite3.connect(DB_FILE)
@@ -30,6 +31,7 @@ def connect_db():
     return connection
 
 
+# 初始化函数：建立竞赛数据表，如果表为空就插入虚构演示数据。
 def init_db():
     """首次运行自动建表并插入演示商品（其实是竞赛）数据。"""
     with connect_db() as db:
@@ -63,6 +65,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Stellula Mini API", description="Python 课程演示后端", lifespan=lifespan)
 
 
+# class 用来定义类；BaseModel 负责检查提交的数据类型和字段条件。
 class CompetitionInput(BaseModel):
     """定义新增/修改竞赛时，前端必须提供的数据。"""
     name: str = Field(min_length=1, max_length=120)
@@ -102,6 +105,8 @@ def list_competitions(q: str = ""):
 
 
 @app.get("/competitions/match")
+# 匹配流程：for 遍历每条赛事，if/elif 判断专业，any 检查兴趣，最后 sorted 按分数排序。
+# 这里用固定规则评分，不涉及机器学习模型训练。
 def match_competitions(
     major: str = "",
     year: int | None = Query(default=None, ge=1, le=8),
@@ -112,7 +117,9 @@ def match_competitions(
     正式 Stellula 还包含更复杂的专业映射与关联规则；
     这里保留适合课堂解释的核心思想。
     """
+    # [] 表示空列表，之后用 append() 依次放入匹配结果。
     results = []
+    # for ... in ... 表示依次取出每一个元素，item 是当前竞赛。
     for item in all_competitions():
         # 指定年级时，不在可参赛年级里的赛事直接跳过。
         if year is not None and item["years"] and year not in item["years"]:
@@ -130,11 +137,13 @@ def match_competitions(
         if interest and any(interest.strip().lower() in x.lower() for x in item["interests"]):
             interest_score = 30
             reasons.append("兴趣方向相关")
+        # = 是赋值；+ 把专业分与兴趣分相加，得到匹配总分。
         score = major_score + interest_score
         # 无筛选条件时显示全部；有专业/兴趣条件时只显示相关项。
         if (major or interest) and score == 0:
             continue
         results.append({**item, "match_score": score, "match_reasons": reasons})
+    # return 返回排序结果；sorted 负责排序；lambda 定义临时的排序规则。
     return sorted(results, key=lambda c: (-c["match_score"], c["id"]))
 
 
