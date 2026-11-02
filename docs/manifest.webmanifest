@@ -1,0 +1,17 @@
+{
+  "name": "Stellula Mini · 竞赛导航",
+  "short_name": "Stellula Mini",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f7fd",
+  "theme_color": "#101e38",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
